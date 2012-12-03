@@ -34,8 +34,8 @@ export CalendarTime,
        hms,
        hm
 
-import Base.show, Base.(+), Base.(-)
-export show, (+), (-)
+import Base.show, Base.(+), Base.(-), Base.(<), Base.(==)
+export show, (+), (-), (<), (==)
 
 type CalendarTime
     millis::Float64
@@ -109,6 +109,10 @@ end
 am(t::CalendarTime) = !pm(t)
 
 (-)(t1::CalendarTime, t2::CalendarTime) = (-)(t1.millis, t2.millis)*1e-3
+
+for op in [:<, :(==)]
+    @eval ($op)(t1::CalendarTime, t2::CalendarTime) = ($op)(t1.millis, t2.millis)
+end
 
 function show(io::IO, t::CalendarTime)
     s = ICU.format(_get_format(t.tz), t.millis)
