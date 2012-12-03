@@ -30,8 +30,8 @@ julia> t = ymd_hms(2013, 5, 2, 13, 45, 7, "PST")
 May 2, 2013 1:45:07 PM PDT
 ```
 
-Extracting fields
------------------
+Extracting & setting fields
+---------------------------
 
 ```jlcon
 julia> t
@@ -84,6 +84,16 @@ Available fields:
     pm(d)         </td><td> is time after noon?
 </td></tr>
 </table>
+
+The two argument form lets you set individual fields:
+
+```jlcon
+julia> t2 = now()
+Dec 3, 2012 3:53:08 PM EST
+
+julia> minute(t2, 7)
+Dec 3, 2012 3:07:08 PM EST
+```
  
 Durations
 ---------

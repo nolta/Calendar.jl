@@ -21,6 +21,7 @@ export CalendarTime,
        minute,
        second,
        am, pm,
+       tz,
 
        # durations
        CalendarDuration,
@@ -43,10 +44,10 @@ type CalendarTime
 end
 
 # default timezone
-_tz = C_NULL
+_tz = ICU.getDefaultTimeZone()
 
 # timezone cache
-_tzs = { _tz => (ICU.ICUCalendar(),ICU.ICUDateFormat()) }
+_tzs = Dict()
 
 function _get_tz(tz)
     if !has(_tzs, tz)
@@ -77,6 +78,7 @@ end
 ymd(y, m, d) = ymd(y, m, d, _tz)
 
 tz(t::CalendarTime) = t.tz
+tz(t::CalendarTime, tz) = (t.tz = tz; t)
 with_tz(t::CalendarTime, tz) = CalendarTime(t.millis, tz)
 
 for (f,k) in [(:year,ICU.UCAL_YEAR),
@@ -93,6 +95,14 @@ for (f,k) in [(:year,ICU.UCAL_YEAR),
             cal = _get_cal(t.tz)
             ICU.setMillis(cal, t.millis)
             ICU.get(cal, $k)
+        end
+
+        function ($f)(t::CalendarTime, val::Integer)
+            cal = _get_cal(t.tz)
+            ICU.setMillis(cal, t.millis)
+            ICU.set(cal, $k, val)
+            t.millis = ICU.getMillis(cal)
+            t
         end
     end
 end
