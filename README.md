@@ -91,7 +91,7 @@ The two argument form lets you set individual fields:
 julia> t2 = now()
 Dec 3, 2012 3:53:08 PM EST
 
-julia> minute(t2, 7)
+julia> minute!(t2, 7)
 Dec 3, 2012 3:07:08 PM EST
 ```
  
@@ -124,10 +124,10 @@ Timezones
 julia> est = ymd_hms(2013, 3, 10, 1, 59, 59)
 Mar 10, 2013 1:59:59 AM EST
 
-julia> pst = with_tz(est, "PST")  # change timezone
+julia> pst = tz(est, "PST")  # change timezone
 Mar 9, 2013 10:59:59 PM PST
 
-julia> est + seconds(1)           # note DST transition
+julia> est + seconds(1)      # note DST transition
 Mar 10, 2013 3:00:00 AM EDT
 
 julia> pst + seconds(1)

@@ -6,7 +6,6 @@ import ICU
 
 export CalendarTime,
        now,
-       with_tz,
        ymd,
        ymd_hms,
 
@@ -22,6 +21,18 @@ export CalendarTime,
        second,
        am, pm,
        tz,
+
+       # mutate fields
+       year!,
+       month!,
+       week!,
+       dayofyear!,
+       day!,
+       hour24!,
+       hour12!,
+       minute!,
+       second!,
+       tz!,
 
        # durations
        CalendarDuration,
@@ -78,39 +89,43 @@ end
 ymd(y, m, d) = ymd(y, m, d, _tz)
 
 tz(t::CalendarTime) = t.tz
-tz(t::CalendarTime, tz) = (t.tz = tz; t)
-with_tz(t::CalendarTime, tz) = CalendarTime(t.millis, tz)
+tz(t::CalendarTime, tz) = CalendarTime(t.millis, tz)
+tz!(t::CalendarTime, tz) = (t.tz = tz; t)
 
-for (f,k) in [(:year,ICU.UCAL_YEAR),
-              (:week,ICU.UCAL_WEEK_OF_YEAR),
-              (:dayofyear,ICU.UCAL_DAY_OF_YEAR),
-              (:day,ICU.UCAL_DATE),
-              (:hour12,ICU.UCAL_HOUR),
-              (:hour24,ICU.UCAL_HOUR_OF_DAY),
-              (:minute,ICU.UCAL_MINUTE),
-              (:second,ICU.UCAL_SECOND)]
+for (f,k,o) in [(:year,ICU.UCAL_YEAR,0),
+                (:month,ICU.UCAL_MONTH,1),
+                (:week,ICU.UCAL_WEEK_OF_YEAR,0),
+                (:dayofyear,ICU.UCAL_DAY_OF_YEAR,0),
+                (:day,ICU.UCAL_DATE,0),
+                (:hour12,ICU.UCAL_HOUR,0),
+                (:hour24,ICU.UCAL_HOUR_OF_DAY,0),
+                (:minute,ICU.UCAL_MINUTE,0),
+                (:second,ICU.UCAL_SECOND,0)]
 
     @eval begin
         function ($f)(t::CalendarTime)
             cal = _get_cal(t.tz)
             ICU.setMillis(cal, t.millis)
-            ICU.get(cal, $k)
+            ICU.get(cal, $k) + $o
         end
 
         function ($f)(t::CalendarTime, val::Integer)
             cal = _get_cal(t.tz)
             ICU.setMillis(cal, t.millis)
-            ICU.set(cal, $k, val)
+            ICU.set(cal, $k, val - $o)
+            CalendarTime(ICU.getMillis(cal), t.tz)
+        end
+
+        function $(symbol(string(f,'!')))(t::CalendarTime, val::Integer)
+            cal = _get_cal(t.tz)
+            ICU.setMillis(cal, t.millis)
+            ICU.set(cal, $k, val - $o)
             t.millis = ICU.getMillis(cal)
             t
         end
     end
 end
-function month(t::CalendarTime)
-    cal = _get_cal(t.tz)
-    ICU.setMillis(cal, t.millis)
-    ICU.get(cal, ICU.UCAL_MONTH) + 1
-end
+
 function pm(t::CalendarTime)
     cal = _get_cal(t.tz)
     ICU.setMillis(cal, t.millis)
