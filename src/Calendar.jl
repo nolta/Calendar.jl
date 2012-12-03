@@ -116,7 +116,7 @@ end
 
 function show(io::IO, t::CalendarTime)
     s = ICU.format(_get_format(t.tz), t.millis)
-    show(io, s)
+    print(io, s)
 end
 
 # XXX:probably should replace w/ Dict{Symbol,Int}
