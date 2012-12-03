@@ -4,16 +4,18 @@ Calendar.jl: Calendar time for Julia
 Installation
 ------------
 
+To install the package:
+
     julia> Pkg.update()
     julia> Pkg.add("Calendar")
 
-Usage
------
+Then, to load into your session:
 
     julia> require("Calendar")
     julia> using Calendar
 
-### Create times
+Creating times
+--------------
 
     julia> t = now()
     "Dec 3, 2012 12:01:38 AM EST"
@@ -21,7 +23,8 @@ Usage
     julia> t = ymd_hms(2013, 5, 2, 13, 45, 7)
     "May 2, 2013 1:45:07 PM EDT"
 
-### Extract fields
+Extracting fields
+-----------------
 
     julia> t
     "May 2, 2013 1:45:07 PM EDT"
@@ -49,7 +52,8 @@ Available fields:
     am(d)         # is time before noon?
     pm(d)         # is time after noon?
  
-### Durations
+Durations
+---------
 
     julia> t
     "May 2, 2013 1:45:07 PM EDT"
@@ -66,17 +70,10 @@ Available fields:
     julia> t + d
     "May 2, 2014 2:29:07 PM EDT"
 
-Available durations:
+Available durations: `years, months, weeks, days, hours, minutes, seconds`
 
-     years
-     months
-     weeks
-     days
-     hours
-     minutes
-     seconds
-
-### Timezones
+Timezones
+---------
 
     julia> est = ymd_hms(2013, 3, 10, 1, 59, 59)
     "Mar 10, 2013 1:59:59 AM EST"
