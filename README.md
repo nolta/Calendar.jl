@@ -66,7 +66,7 @@ Available fields:
     dayofyear(d)  </td><td>
 </td></tr>
 <tr><td>
-    hour24(d)     </td><td> 24hr clock
+    hour(d)       </td><td> 24hr clock
 </td></tr>
 <tr><td>
     hour12(d)     </td><td> 12hr clock
