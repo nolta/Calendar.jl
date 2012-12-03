@@ -117,7 +117,7 @@ Mar 10, 2013 1:59:59 AM EST
 julia> pst = with_tz(est, "PST")  # change timezone
 Mar 9, 2013 10:59:59 PM PST
 
-julia> est + seconds(1)
+julia> est + seconds(1)           # note DST transition
 Mar 10, 2013 3:00:00 AM EDT
 
 julia> pst + seconds(1)
