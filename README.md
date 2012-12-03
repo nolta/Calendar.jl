@@ -49,17 +49,41 @@ false
 
 Available fields:
 
-    year(d)
-    month(d)      # numbered 1-12
-    week(d)       # week of year
-    day(d)        # day of month
-    dayofyear(d)
-    hour24(d)     # 24hr clock
-    hour12(d)     # 12hr clock
-    minute(d)
-    second(d)
-    am(d)         # is time before noon?
-    pm(d)         # is time after noon?
+<table>
+<tr><td>
+    year(d)       </td><td>
+</td></tr>
+<tr><td>
+    month(d)      </td><td> numbered 1-12
+</td></tr>
+<tr><td>
+    week(d)       </td><td> week of year
+</td></tr>
+<tr><td>
+    day(d)        </td><td> day of month
+</td></tr>
+<tr><td>
+    dayofyear(d)  </td><td>
+</td></tr>
+<tr><td>
+    hour24(d)     </td><td> 24hr clock
+</td></tr>
+<tr><td>
+    hour12(d)     </td><td> 12hr clock
+</td></tr>
+<tr><td>
+    minute(d)     </td><td>
+</td></tr>
+<tr><td>
+    second(d)     </td><td>
+</td></tr>
+<tr><td>
+    am(d)         </td><td> is time before noon?
+</td></tr>
+<tr><td>
+    pm(d)         </td><td> is time after noon?
+</td></tr>
+</table>
  
 Durations
 ---------
