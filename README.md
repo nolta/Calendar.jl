@@ -34,11 +34,17 @@ String formatting & parsing
 ---------------------------
 
 ```jlcon
-julia> format("yyyy-MMMM-dd HH:mm:ss V", est)
+julia> t = ymd_hms(2013, 3, 10, 1, 59, 59)
+Mar 10, 2013 1:59:59 AM EST
+
+julia> s = format("yyyy-MMMM-dd HH:mm:ss V", t)
 "2013-March-10 01:59:59 EST"
 
-julia> parse("yyyy-MMMM-dd HH:mm:ss V", "2013-March-10 01:59:59 EST")
+julia> t2 = parse("yyyy-MMMM-dd HH:mm:ss V", s)
 Mar 10, 2013 1:59:59 AM EST
+
+julia> t == t2
+true
 ```
 
 See [here](http://userguide.icu-project.org/formatparse/datetime) for a list of format codes.
