@@ -5,6 +5,7 @@ module Calendar
 import ICU
 
 export CalendarTime,
+       format,
        now,
        ymd,
        ymd_hms,
@@ -57,17 +58,27 @@ end
 # default timezone
 _tz = ICU.getDefaultTimeZone()
 
-# timezone cache
-_tzs = Dict()
-
-function _get_tz(tz)
-    if !has(_tzs, tz)
-        _tzs[tz] = ICU.ICUCalendar(tz), ICU.ICUDateFormat(tz)
+const _cal_cache = Dict()
+function _get_cal(tz)
+    if !has(_cal_cache, tz)
+        _cal_cache[tz] = ICU.ICUCalendar(tz)
     end
-    return _tzs[tz]
+    _cal_cache[tz]
 end
-_get_cal(tz) = _get_tz(tz)[1]
-_get_format(tz) = _get_tz(tz)[2]
+
+const _format_cache = Dict()
+function _get_format(tz)
+    if !has(_format_cache, tz)
+        _format_cache[tz] = ICU.ICUDateFormat(ICU.UDAT_LONG, ICU.UDAT_MEDIUM, tz)
+    end
+    _format_cache[tz]
+end
+function _get_format(pattern, tz)
+    if !has(_format_cache, (pattern,tz))
+        _format_cache[tz] = ICU.ICUDateFormat(pattern, tz)
+    end
+    _format_cache[tz]
+end
 
 now(tz) = CalendarTime(ICU.getNow(), tz)
 now() = now(_tz)
@@ -137,6 +148,10 @@ am(t::CalendarTime) = !pm(t)
 
 for op in [:<, :(==)]
     @eval ($op)(t1::CalendarTime, t2::CalendarTime) = ($op)(t1.millis, t2.millis)
+end
+
+function format(pattern::String, t::CalendarTime)
+    ICU.format(_get_format(pattern,t.tz), t.millis)
 end
 
 function show(io::IO, t::CalendarTime)
