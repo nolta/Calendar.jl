@@ -134,5 +134,12 @@ julia> pst + seconds(1)
 Mar 9, 2013 11:00:00 PM PST
 ```
 
-Formatting
-----------
+String formatting
+-----------------
+
+```jlcon
+julia> format("yyyy-MMMM-dd HH:mm:ss V", est)
+"2013-March-10 01:59:59 EST"
+```
+
+See [here](http://userguide.icu-project.org/formatparse/datetime) for a list of format codes.
