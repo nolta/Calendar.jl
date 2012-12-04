@@ -30,6 +30,19 @@ julia> t = ymd_hms(2013, 5, 2, 13, 45, 7, "PST")
 May 2, 2013 1:45:07 PM PDT
 ```
 
+String formatting & parsing
+---------------------------
+
+```jlcon
+julia> format("yyyy-MMMM-dd HH:mm:ss V", est)
+"2013-March-10 01:59:59 EST"
+
+julia> parse("yyyy-MMMM-dd HH:mm:ss V", "2013-March-10 01:59:59 EST")
+Mar 10, 2013 1:59:59 AM EST
+```
+
+See [here](http://userguide.icu-project.org/formatparse/datetime) for a list of format codes.
+
 Extracting & setting fields
 ---------------------------
 
@@ -136,16 +149,3 @@ Mar 10, 2013 3:00:00 AM EDT
 julia> pst + seconds(1)
 Mar 9, 2013 11:00:00 PM PST
 ```
-
-String formatting & parsing
----------------------------
-
-```jlcon
-julia> format("yyyy-MMMM-dd HH:mm:ss V", est)
-"2013-March-10 01:59:59 EST"
-
-julia> parse("yyyy-MMMM-dd HH:mm:ss V", "2013-March-10 01:59:59 EST")
-Mar 10, 2013 1:59:59 AM EST
-```
-
-See [here](http://userguide.icu-project.org/formatparse/datetime) for a list of format codes.
