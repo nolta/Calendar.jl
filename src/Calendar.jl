@@ -7,6 +7,7 @@ import ICU
 export CalendarTime,
        format,
        now,
+       parse,
        ymd,
        ymd_hms,
 
@@ -74,10 +75,11 @@ function _get_format(tz)
     _format_cache[tz]
 end
 function _get_format(pattern, tz)
-    if !has(_format_cache, (pattern,tz))
-        _format_cache[tz] = ICU.ICUDateFormat(pattern, tz)
+    k = pattern,tz
+    if !has(_format_cache, k)
+        _format_cache[k] = ICU.ICUDateFormat(pattern, tz)
     end
-    _format_cache[tz]
+    _format_cache[k]
 end
 
 now(tz) = CalendarTime(ICU.getNow(), tz)
@@ -152,6 +154,15 @@ end
 
 function format(pattern::String, t::CalendarTime)
     ICU.format(_get_format(pattern,t.tz), t.millis)
+end
+
+function parse(pattern::String, s::String)
+    try
+        millis = ICU.parse(_get_format(pattern,_tz), s)
+        return CalendarTime(millis, _tz)
+    catch
+        error("failed to parse '", s, "' with '", pattern, "'")
+    end
 end
 
 function show(io::IO, t::CalendarTime)
