@@ -1,10 +1,14 @@
 Calendar.jl: Calendar time for Julia
 ====================================
 
-The design is heavily influenced by Hadley Wickham's lubridate package for R.
+The design is inspired by Hadley Wickham's lubridate package for R and the ISO 8601 standard.
 
 Installation
 ------------
+
+** Note: Calendar has not been added to the package system yet, so the instruction below don't work yet.
+Instead, install the "ICU" package, download the code, and use `load("/path/to/Calendar.jl/src/Calendar.jl")`
+in place of `require("Calendar")`.**
 
 To install the package:
 
@@ -131,7 +135,7 @@ julia> t + days(60)
 Jul 1, 2013 1:45:07 PM PDT
 
 julia> d = years(1) + minutes(44)
-1 year, 44 minutes
+1 year + 44 minutes
 
 julia> t + d
 May 2, 2014 2:29:07 PM PDT
