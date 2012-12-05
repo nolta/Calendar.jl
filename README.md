@@ -104,7 +104,7 @@ Available fields:
 </td></tr>
 </table>
 
-The two argument form lets you set individual fields:
+The two-argument form lets you set individual fields:
 
 ```jlcon
 julia> t2 = now()
@@ -154,4 +154,28 @@ Mar 10, 2013 3:00:00 AM EDT
 
 julia> pst + seconds(1)
 Mar 9, 2013 11:00:00 PM PST
+```
+
+Ranges
+------
+
+Just as `1:2:10` represents the integers 1,3,5,7,9; `<time1>:<duration>:<time2>`
+represents the times `<time1>, <time1>+<duration>, <time1>+2<duration>, ...`
+
+```jlcon
+julia> t = now()
+2012-12-04 10:24:19 PM EST
+
+julia> t2 = t + minutes(4)
+2012-12-04 10:28:19 PM EST
+
+julia> r = t:minutes(1):t2
+2012-12-04 10:24:19 PM EST:1 minute:2012-12-04 10:28:19 PM EST
+
+julia> for x in r println(x) end
+2012-12-04 10:24:19 PM EST
+2012-12-04 10:25:19 PM EST
+2012-12-04 10:26:19 PM EST
+2012-12-04 10:27:19 PM EST
+2012-12-04 10:28:19 PM EST
 ```
