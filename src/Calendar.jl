@@ -48,13 +48,15 @@ export CalendarTime,
        hms,
        hm
 
-import Base.show, Base.(+), Base.(-), Base.(<), Base.(==)
-export show, (+), (-), (<), (==)
+import Base.show, Base.(+), Base.(-), Base.(<), Base.(==), Base.length
 
 type CalendarTime
     millis::Float64
     tz
 end
+
+# needed by DataFrames
+length(::CalendarTime) = 1
 
 # default timezone
 _tz = ICU.getDefaultTimeZone()
