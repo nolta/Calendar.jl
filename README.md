@@ -6,9 +6,9 @@ The design is inspired by Hadley Wickham's lubridate package for R and the ISO 8
 Installation
 ------------
 
-** Note: Calendar has not been added to the package system yet, so the instruction below don't work yet.
+__Note: Calendar has not been added to the package system yet, so the instruction below don't work yet.
 Instead, install the "ICU" package, download the code, and use `load("/path/to/Calendar.jl/src/Calendar.jl")`
-in place of `require("Calendar")`.**
+in place of `require("Calendar")`.__
 
 To install the package:
 
@@ -153,7 +153,7 @@ Mar 10, 2013 1:59:59 AM EST
 julia> pst = tz(est, "PST")  # change timezone
 Mar 9, 2013 10:59:59 PM PST
 
-julia> est + seconds(1)      # note DST transition
+julia> est + seconds(1)      # note daylight savings time transition
 Mar 10, 2013 3:00:00 AM EDT
 
 julia> pst + seconds(1)
