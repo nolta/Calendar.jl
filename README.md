@@ -21,6 +21,13 @@ Then, to load into your session:
     julia> require("Calendar")
     julia> using Calendar
 
+Calendar.jl requires the [International Components for Unicode (ICU) library](http://site.icu-project.org/)
+be installed on your system. It comes preinstalled on OS X and most Linux desktop distributions, but if not:
+
+* Arch: `pacman -S icu`
+* Fedora: `yum install icu`
+* Ubuntu: `aptitude install libicu48`
+
 Creating times
 --------------
 
@@ -193,7 +200,7 @@ Based on your system settings, dates will be displayed as:
 China:
 ```jlcon
 julia> Calendar.now()
-2012-12-6 格林尼治标准时间-0500下午4时09分23秒
+2012-12-6 GMT-0500下午4时09分23秒
 ```
 
 Germany:
