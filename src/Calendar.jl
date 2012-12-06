@@ -162,14 +162,15 @@ function format(pattern::String, t::CalendarTime)
     ICU.format(_get_format(pattern,t.tz), t.millis)
 end
 
-function parse(pattern::String, s::String)
+function parse(pattern::String, s::String, tz::String)
     try
-        millis = ICU.parse(_get_format(pattern,_tz), s)
-        return CalendarTime(millis, _tz)
+        millis = ICU.parse(_get_format(pattern,tz), s)
+        return CalendarTime(millis, tz)
     catch
         error("failed to parse '", s, "' with '", pattern, "'")
     end
 end
+parse(pattern, s) = parse(pattern, s, _tz)
 
 function show(io::IO, t::CalendarTime)
     s = ICU.format(_get_format(t.tz), t.millis)
