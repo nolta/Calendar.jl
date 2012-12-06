@@ -1,6 +1,7 @@
 Calendar.jl: Calendar time for Julia
 ====================================
 
+Calendar.jl is a simple, timezone-aware, localized calendar date & time module for Julia.
 The design is inspired by Hadley Wickham's lubridate package for R and the ISO 8601 standard.
 
 Installation
@@ -183,3 +184,28 @@ julia> for x in r println(x) end
 2012-12-04 10:27:19 PM EST
 2012-12-04 10:28:19 PM EST
 ```
+
+Localization (i18n)
+-------------------
+
+Based on your system settings, dates will be displayed as:
+
+China:
+```jlcon
+julia> Calendar.now()
+2012-12-6 格林尼治标准时间-0500下午4时09分23秒
+```
+
+Germany:
+```jlcon
+julia> Calendar.now()
+06.12.2012 16:08:36 GMT-05:00
+```
+
+France:
+```jlcon
+julia> Calendar.now()
+6 déc. 2012 16:07:56 UTC-05:00
+```
+
+etc...
