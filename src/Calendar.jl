@@ -51,7 +51,11 @@ export CalendarTime,
        hm,
 
        # ranges
-       CalendarTimeRange
+       CalendarTimeRange, 
+
+       #Constants
+       Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, 
+       January, February, March, April, May, June, July, August, September, October, November, December
 
 import Base.show, Base.(+), Base.(-), Base.(<), Base.(==), Base.length,
        Base.colon, Base.ref, Base.start, Base.next, Base.done, Base.(*),
@@ -351,5 +355,27 @@ step(r::CalendarTimeRange) = r.step
 start(r::CalendarTimeRange) = 0
 next{T}(r::CalendarTimeRange{T}, i) = (r.start + i*r.step, i+1)
 done(r::CalendarTimeRange, i) = length(r) <= i
+
+const Sunday = 1
+const Monday = 2
+const Tuesday = 3
+const Wednesday = 4
+const Thursday = 5
+const Friday = 6
+const Saturday = 7
+
+const January = 1
+const February = 2
+const March = 3
+const April = 4
+const May = 5
+const June = 6
+const July = 7
+const August = 8
+const September = 9
+const October = 10
+const November = 11
+const December = 12
+
 
 end # module
