@@ -97,6 +97,9 @@ Available fields:
     dayofyear(d)  </td><td>
 </td></tr>
 <tr><td>
+    dayofweek(d)  </td><td> Sunday==1
+</td></tr>
+<tr><td>
     hour(d)       </td><td> 24hr clock
 </td></tr>
 <tr><td>
