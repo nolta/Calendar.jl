@@ -7,10 +7,6 @@ The design is inspired by Hadley Wickham's lubridate package for R and the ISO 8
 Installation
 ------------
 
-__Note: Calendar has not been added to the package system yet, so the instructions below don't work.
-Instead, install the "ICU" package, download the "Calendar.jl" code, and use `load("/path/to/Calendar.jl/src/Calendar.jl")`
-in place of `require("Calendar")`.__
-
 To install the package:
 
     julia> Pkg.update()
