@@ -10,6 +10,7 @@ export CalendarTime,
        parse,
        ymd,
        ymd_hms,
+       isleap,
 
        # fields
        year,
@@ -152,6 +153,9 @@ for (f,k,o) in [(:year,ICU.UCAL_YEAR,0),
         end
     end
 end
+
+isleap(t::CalendarTime) = isleap(year(t))
+isleap(y::Integer) = (((y % 4 == 0) && (y % 100 != 0)) || (y % 400 == 0))
 
 function pm(t::CalendarTime)
     cal = _get_cal(t.tz)
