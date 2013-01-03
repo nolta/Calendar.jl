@@ -7,6 +7,7 @@ import ICU
 export CalendarTime,
        format,
        now,
+       today,
        parse,
        ymd,
        ymd_hms,
@@ -98,6 +99,11 @@ end
 
 now(tz) = CalendarTime(ICU.getNow(), tz)
 now() = now(_tz)
+
+function today()
+    n=now()
+    ymd(year(n), month(n), day(n))
+end
 
 function ymd_hms(y, mo, d, h, mi, s, tz)
     cal = _get_cal(tz)
