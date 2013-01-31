@@ -60,8 +60,8 @@ export CalendarTime,
        January, February, March, April, May, June, July, August, September, October, November, December
 
 import Base.show, Base.(+), Base.(-), Base.(<), Base.(==), Base.length,
-       Base.colon, Base.ref, Base.start, Base.next, Base.done, Base.(*),
-       Base.size, Base.step
+       Base.colon, Base.ref, Base.start, Base.next, Base.done, Base.(*), Base.(.*),
+       Base.size, Base.step, Base.vcat
 
 type CalendarTime
     millis::Float64
@@ -157,11 +157,13 @@ for (f,k,o) in [(:year,ICU.UCAL_YEAR,0),
             t.millis = ICU.getMillis(cal)
             t
         end
+        @vectorize_1arg CalendarTime $f
     end
 end
 
 isleap(t::CalendarTime) = isleap(year(t))
 isleap(y::Integer) = (((y % 4 == 0) && (y % 100 != 0)) || (y % 400 == 0))
+@vectorize_1arg CalendarTime isleap
 
 function pm(t::CalendarTime)
     cal = _get_cal(t.tz)
@@ -169,6 +171,8 @@ function pm(t::CalendarTime)
     ICU.get(cal, ICU.UCAL_AM_PM) == 1
 end
 am(t::CalendarTime) = !pm(t)
+@vectorize_1arg CalendarTime am
+@vectorize_1arg CalendarTime pm
 
 for op in [:<, :(==)]
     @eval ($op)(t1::CalendarTime, t2::CalendarTime) = ($op)(t1.millis, t2.millis)
@@ -187,6 +191,9 @@ function parse(pattern::String, s::String, tz::String)
     end
 end
 parse(pattern, s) = parse(pattern, s, _tz)
+parse{S<:String}(pattern::String, s::AbstractArray{S}, tz::String) = map(x -> parse(pattern, x, tz), s)
+parse{S<:String}(pattern::String, s::AbstractArray{S}) = map(x -> parse(pattern, x, _tz), s)
+
 
 function show(io::IO, t::CalendarTime)
     s = ICU.format(_get_format(t.tz), t.millis)
@@ -210,9 +217,11 @@ CalendarDuration() = CalendarDuration(0,0,0,0.)
 
 for f in [:years,:months,:weeks]
     @eval $f(x::Integer) = (d = CalendarDuration(); d.($(expr(:quote,f))) = x; d)
+    @eval @vectorize_1arg Integer $f
 end
 for (f,a) in [(:days,86400e3),(:hours,3600e3),(:minutes,60e3),(:seconds,1e3)]
     @eval ($f)(x::Real) = FixedCalendarDuration(x*($a))
+    @eval @vectorize_1arg Real $f
 end
 hms(h::Real, m::Real, s::Real) = FixedCalendarDuration(1e3(60(60h + m) + s))
 hm(h::Real, m::Real) = hms(h, m, 0)
@@ -312,15 +321,32 @@ for op in [:+, :-]
             CalendarTime(($op)(t.millis, d.millis), t.tz)
 
         ($op)(d::AbstractCalendarDuration, t::CalendarTime) = ($op)(t, d)
+
+        @vectorize_2arg Union(CalendarTime, AbstractCalendarDuration) $op
+        # Fix up cases that @vectorize doesn't cover (without this, the result is of type Array{Any}):
+        # I can't figure out how to consolidate this.
+        ($op)(x::Array{CalendarTime}, y::Array{CalendarDuration}     ) = reshape(CalendarTime[ ($op)(x[i], y[i]) for i=1:length(x) ], promote_shape(size(x),size(y)))
+        ($op)(x::Array{CalendarTime}, y::Array{FixedCalendarDuration}) = reshape(CalendarTime[ ($op)(x[i], y[i]) for i=1:length(x) ], promote_shape(size(x),size(y)))
+        ($op)(y::Array{CalendarDuration}     , x::Array{CalendarTime}) = reshape(CalendarTime[ ($op)(x[i], y[i]) for i=1:length(x) ], promote_shape(size(x),size(y)))
+        ($op)(y::Array{FixedCalendarDuration}, x::Array{CalendarTime}) = reshape(CalendarTime[ ($op)(x[i], y[i]) for i=1:length(x) ], promote_shape(size(x),size(y)))
     end
 end
 
-(*)(d::CalendarDuration, i::Integer) =
-    CalendarDuration(d.years*i, d.months*i, d.weeks*i, d.millis*i)
-(*)(d::FixedCalendarDuration, x::Real) = FixedCalendarDuration(d.millis*x)
-(*)(x, d::AbstractCalendarDuration) = d*x
+for op in [:*, :.*]
+    @eval begin
+        ($op)(d::CalendarDuration, i::Integer) = CalendarDuration(d.years*i, d.months*i, d.weeks*i, d.millis*i)
+        ($op)(d::FixedCalendarDuration, x::Real) = FixedCalendarDuration(d.millis*x)
+        ($op){T<:AbstractCalendarDuration}(d::Array{T}, i::Integer) = 
+            reshape([ d[j] * i for j=1:length(d) ], size(d))
+        ($op){I<:Integer}(d::AbstractCalendarDuration, i::Array{I}) = 
+            reshape([ d * i[j] for j=1:length(i) ], size(i))
+        ($op)(x, d::AbstractCalendarDuration) = ($op)(d, x)
+    end
+end
 
 (-)(t1::CalendarTime, t2::CalendarTime) = FixedCalendarDuration(t1.millis - t2.millis)
+@vectorize_2arg CalendarTime (-)
+
 
 function (-)(d::CalendarDuration)
     d2 = CalendarDuration()
@@ -330,6 +356,7 @@ function (-)(d::CalendarDuration)
     d2
 end
 (-)(d::FixedCalendarDuration) = FixedCalendarDuration(-d.millis)
+@vectorize_1arg AbstractCalendarDuration (-)
 
 for op in [:<, :(==)]
     @eval begin
@@ -365,6 +392,19 @@ step(r::CalendarTimeRange) = r.step
 start(r::CalendarTimeRange) = 0
 next{T}(r::CalendarTimeRange{T}, i) = (r.start + i*r.step, i+1)
 done(r::CalendarTimeRange, i) = length(r) <= i
+
+function vcat(r::CalendarTimeRange)
+    n = length(r)
+    a = Array(CalendarTime,n)
+    i = 1
+    for x in r
+        a[i] = x
+        i += 1
+    end
+    return a
+end
+
+convert(::Type{Array{CalendarTime,1}}, r::CalendarTimeRange) = vcat(r)
 
 const Sunday = 1
 const Monday = 2
