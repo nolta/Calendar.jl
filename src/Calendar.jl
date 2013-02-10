@@ -61,7 +61,7 @@ export CalendarTime,
 
 import Base.show, Base.(+), Base.(-), Base.(<), Base.(==), Base.length,
        Base.colon, Base.ref, Base.start, Base.next, Base.done, Base.(*), Base.(.*),
-       Base.size, Base.step, Base.vcat
+       Base.size, Base.step, Base.vcat, Base.isless
 
 type CalendarTime
     millis::Float64
@@ -174,7 +174,7 @@ am(t::CalendarTime) = !pm(t)
 @vectorize_1arg CalendarTime am
 @vectorize_1arg CalendarTime pm
 
-for op in [:<, :(==)]
+for op in [:<, :(==), :isless]
     @eval ($op)(t1::CalendarTime, t2::CalendarTime) = ($op)(t1.millis, t2.millis)
 end
 
