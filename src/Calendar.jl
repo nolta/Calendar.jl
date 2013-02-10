@@ -365,7 +365,7 @@ for op in [:<, :(==)]
     end
 end
 
-type CalendarTimeRange{T<:AbstractCalendarDuration} #<: Ranges{CalendarTime}
+type CalendarTimeRange{T<:AbstractCalendarDuration} <: Ranges{CalendarTime}
     start::CalendarTime
     step::T
     len::Int

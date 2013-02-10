@@ -14,7 +14,6 @@ To install the package:
 
 Then, to load into your session:
 
-    julia> require("Calendar")
     julia> using Calendar
 
 Calendar.jl requires the [International Components for Unicode (ICU) library](http://site.icu-project.org/)
