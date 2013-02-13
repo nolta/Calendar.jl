@@ -61,15 +61,19 @@ export CalendarTime,
 
 import Base.show, Base.(+), Base.(-), Base.(<), Base.(==), Base.length,
        Base.colon, Base.ref, Base.start, Base.next, Base.done, Base.(*), Base.(.*),
-       Base.size, Base.step, Base.vcat, Base.isless
+       Base.size, Base.step, Base.vcat, Base.isless, Base.hash, Base.isequal
 
 type CalendarTime
     millis::Float64
-    tz
+    tz::String
 end
 
 # needed by DataFrames
 length(::CalendarTime) = 1
+
+# support hashing
+hash(ct::CalendarTime) = bitmix(hash(ct.millis),hash(ct.tz))
+isequal(a::CalendarTime, b::CalendarTime) = a.millis == b.millis && a.tz == b.tz
 
 # default timezone
 _tz = ICU.getDefaultTimeZone()
