@@ -220,7 +220,7 @@ end
 CalendarDuration() = CalendarDuration(0,0,0,0.)
 
 for f in [:years,:months,:weeks]
-    @eval $f(x::Integer) = (d = CalendarDuration(); d.($(expr(:quote,f))) = x; d)
+    @eval $f(x::Integer) = (d = CalendarDuration(); d.($(Expr(:quote,f))) = x; d)
     @eval @vectorize_1arg Integer $f
 end
 for (f,a) in [(:days,86400e3),(:hours,3600e3),(:minutes,60e3),(:seconds,1e3)]
