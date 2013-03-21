@@ -9,6 +9,7 @@ export CalendarTime,
        now,
        today,
        parse,
+       parse_date,
        ymd,
        ymd_hms,
        isleap,
@@ -186,7 +187,7 @@ function format(pattern::String, t::CalendarTime)
     ICU.format(_get_format(pattern,t.tz), t.millis)
 end
 
-function parse(pattern::String, s::String, tz::String)
+function parse_date(pattern::String, s::String, tz::String)
     try
         millis = ICU.parse(_get_format(pattern,tz), s)
         return CalendarTime(millis, tz)
@@ -194,10 +195,10 @@ function parse(pattern::String, s::String, tz::String)
         error("failed to parse '", s, "' with '", pattern, "'")
     end
 end
-parse(pattern, s) = parse(pattern, s, _tz)
-parse{S<:String}(pattern::String, s::AbstractArray{S}, tz::String) = map(x -> parse(pattern, x, tz), s)
-parse{S<:String}(pattern::String, s::AbstractArray{S}) = map(x -> parse(pattern, x, _tz), s)
-
+parse_date(pattern, s) = parse_date(pattern, s, _tz)
+parse_date{S<:String}(pattern::String, s::AbstractArray{S}, tz::String) = map(x -> parse_date(pattern, x, tz), s)
+parse_date{S<:String}(pattern::String, s::AbstractArray{S}) = map(x -> parse_date(pattern, x, _tz), s)
+const parse = parse_date
 
 function show(io::IO, t::CalendarTime)
     s = ICU.format(_get_format(t.tz), t.millis)
