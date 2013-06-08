@@ -47,7 +47,7 @@ Mar 10, 2013 1:59:59 AM EST
 julia> s = format("yyyy-MMMM-dd HH:mm:ss V", t)
 "2013-March-10 01:59:59 EST"
 
-julia> t2 = parse("yyyy-MMMM-dd HH:mm:ss V", s)
+julia> t2 = Calendar.parse("yyyy-MMMM-dd HH:mm:ss V", s)
 Mar 10, 2013 1:59:59 AM EST
 
 julia> t == t2
