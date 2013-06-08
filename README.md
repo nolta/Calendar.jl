@@ -120,10 +120,10 @@ The two-argument form lets you set individual fields:
 julia> t2 = now()
 Dec 3, 2012 3:53:08 PM EST
 
-julia> minute!(t2, 7)       # modifies t2
+julia> minute(t2, 7)
 Dec 3, 2012 3:07:08 PM EST
 
-julia> year(t2, 1984)       # doesn't modify t2
+julia> year(t2, 1984)
 Dec 3, 1984 3:07:08 PM EST
 ```
  
