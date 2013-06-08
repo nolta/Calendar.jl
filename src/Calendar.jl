@@ -185,6 +185,7 @@ end
 function format(pattern::String, t::CalendarTime)
     ICU.format(_get_format(pattern,t.tz), t.millis)
 end
+format(t::CalendarTime, pattern::String) = format(pattern, t)
 
 function parse_date(pattern::String, s::String, tz::String)
     try
