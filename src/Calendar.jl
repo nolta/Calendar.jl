@@ -80,7 +80,7 @@ _tz = ICU.getDefaultTimeZone()
 
 const _cal_cache = Dict()
 function _get_cal(tz)
-    if !has(_cal_cache, tz)
+    if !haskey(_cal_cache, tz)
         _cal_cache[tz] = ICU.ICUCalendar(tz)
     end
     _cal_cache[tz]
@@ -88,14 +88,14 @@ end
 
 const _format_cache = Dict()
 function _get_format(tz)
-    if !has(_format_cache, tz)
+    if !haskey(_format_cache, tz)
         _format_cache[tz] = ICU.ICUDateFormat(ICU.UDAT_LONG, ICU.UDAT_MEDIUM, tz)
     end
     _format_cache[tz]
 end
 function _get_format(pattern, tz)
     k = pattern,tz
-    if !has(_format_cache, k)
+    if !haskey(_format_cache, k)
         _format_cache[k] = ICU.ICUDateFormat(pattern, tz)
     end
     _format_cache[k]
