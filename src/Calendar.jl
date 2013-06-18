@@ -194,7 +194,7 @@ for op in [:<, :(==), :isless]
 end
 
 function format(pattern::String, t::CalendarTime)
-    ICU.format(_get_format(pattern,t.cal), t.millis)
+    utf8(ICU.format(_get_format(pattern,t.cal), t.millis))
 end
 format(t::CalendarTime, pattern::String) = format(pattern, t)
 
