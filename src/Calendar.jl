@@ -26,6 +26,7 @@ export CalendarTime,
        second,
        am, pm,
        tz,
+       timezone,
 
        # mutate fields
        year!,
@@ -128,6 +129,7 @@ ymd(y, m, d) = ymd(y, m, d, _tz)
 tz(t::CalendarTime) = t.tz
 tz(t::CalendarTime, tz) = CalendarTime(t.millis, tz)
 tz!(t::CalendarTime, tz) = (t.tz = tz; t)
+const timezone = tz
 
 for (f,k,o) in [(:year,ICU.UCAL_YEAR,0),
                 (:month,ICU.UCAL_MONTH,1),
