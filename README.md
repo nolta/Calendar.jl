@@ -69,7 +69,7 @@ julia> month(t)
 julia> week(t)
 18
 
-julia> am(t)
+julia> isAM(t)
 false
 ```
 
@@ -107,10 +107,10 @@ Available fields:
     second(d)     </td><td>
 </td></tr>
 <tr><td>
-    am(d)         </td><td> is time before noon?
+    isAM(d)       </td><td> is time before noon?
 </td></tr>
 <tr><td>
-    pm(d)         </td><td> is time after noon?
+    isPM(d)       </td><td> is time after noon?
 </td></tr>
 </table>
 

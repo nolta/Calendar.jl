@@ -11,7 +11,11 @@ export CalendarTime,
        parse_date,
        ymd,
        ymd_hms,
+
+       # tests
        isleap,
+       isAM,
+       isPM,
 
        # fields
        year,
@@ -24,9 +28,11 @@ export CalendarTime,
        hour12,
        minute,
        second,
-       am, pm,
        tz,
        timezone,
+
+       # deprecated
+       am, pm,
 
        # mutate fields
        year!,
@@ -172,13 +178,16 @@ isleap(t::CalendarTime) = isleap(year(t))
 isleap(y::Integer) = (((y % 4 == 0) && (y % 100 != 0)) || (y % 400 == 0))
 @vectorize_1arg CalendarTime isleap
 
-function pm(t::CalendarTime)
+function isPM(t::CalendarTime)
     ICU.setMillis(t.cal, t.millis)
     ICU.get(t.cal, ICU.UCAL_AM_PM) == 1
 end
-am(t::CalendarTime) = !pm(t)
-@vectorize_1arg CalendarTime am
-@vectorize_1arg CalendarTime pm
+isAM(t::CalendarTime) = !isPM(t)
+@vectorize_1arg CalendarTime isAM
+@vectorize_1arg CalendarTime isPM
+
+@deprecate am isAM
+@deprecate pm isPM
 
 for op in [:<, :(==), :isless]
     @eval ($op)(t1::CalendarTime, t2::CalendarTime) = ($op)(t1.millis, t2.millis)
