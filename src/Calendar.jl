@@ -66,35 +66,40 @@ import Base.show, Base.(+), Base.(-), Base.(<), Base.(==), Base.length,
 
 type CalendarTime
     millis::Float64
-    tz::String
+    cal::ICU.ICUCalendar
 end
 
 # needed by DataFrames
 length(::CalendarTime) = 1
 
 # support hashing
-hash(ct::CalendarTime) = bitmix(hash(ct.millis),hash(ct.tz))
-isequal(a::CalendarTime, b::CalendarTime) = a.millis == b.millis && a.tz == b.tz
+hash(ct::CalendarTime) = bitmix(hash(ct.millis),hash(ct.cal))
+isequal(a::CalendarTime, b::CalendarTime) = a.millis == b.millis && a.cal == b.cal
 
 # default timezone
 _tz = ICU.getDefaultTimeZone()
 
 const _cal_cache = Dict()
+const _tz_cache = Dict()
 function _get_cal(tz)
     if !haskey(_cal_cache, tz)
-        _cal_cache[tz] = ICU.ICUCalendar(tz)
+        cal = ICU.ICUCalendar(tz)
+        _cal_cache[tz] = cal
+        _tz_cache[cal] = tz
     end
     _cal_cache[tz]
 end
 
 const _format_cache = Dict()
-function _get_format(tz)
+function _get_format(cal)
+    tz = _tz_cache[cal]
     if !haskey(_format_cache, tz)
         _format_cache[tz] = ICU.ICUDateFormat(ICU.UDAT_LONG, ICU.UDAT_MEDIUM, tz)
     end
     _format_cache[tz]
 end
-function _get_format(pattern, tz)
+function _get_format(pattern, cal)
+    tz = _tz_cache[cal]
     k = pattern,tz
     if !haskey(_format_cache, k)
         _format_cache[k] = ICU.ICUDateFormat(pattern, tz)
@@ -102,11 +107,10 @@ function _get_format(pattern, tz)
     _format_cache[k]
 end
 
-now(tz) = CalendarTime(ICU.getNow(), tz)
-now() = now(_tz)
+now(tz=_tz) = CalendarTime(ICU.getNow(), _get_cal(tz))
 
 function today()
-    n=now()
+    n = now()
     ymd(year(n), month(n), day(n))
 end
 
@@ -114,7 +118,7 @@ function ymd_hms(y, mo, d, h, mi, s, tz)
     cal = _get_cal(tz)
     ICU.clear(cal)
     ICU.setDateTime(cal, y, mo, d, h, mi, s)
-    CalendarTime(ICU.getMillis(cal), tz)
+    CalendarTime(ICU.getMillis(cal), cal)
 end
 ymd_hms(y, mo, d, h, mi, s) = ymd_hms(y, mo, d, h, mi, s, _tz)
 
@@ -122,13 +126,13 @@ function ymd(y, m, d, tz)
     cal = _get_cal(tz)
     ICU.clear(cal)
     ICU.setDate(cal, y, m, d)
-    CalendarTime(ICU.getMillis(cal), tz)
+    CalendarTime(ICU.getMillis(cal), cal)
 end
 ymd(y, m, d) = ymd(y, m, d, _tz)
 
-tz(t::CalendarTime) = t.tz
-tz(t::CalendarTime, tz) = CalendarTime(t.millis, tz)
-tz!(t::CalendarTime, tz) = (t.tz = tz; t)
+tz(t::CalendarTime) = _tz_cache[t.cal]
+tz(t::CalendarTime, tz) = CalendarTime(t.millis, _get_cal(tz))
+tz!(t::CalendarTime, tz) = (t.cal = _get_cal(tz); t)
 const timezone = tz
 
 for (f,k,o) in [(:year,ICU.UCAL_YEAR,0),
@@ -144,23 +148,20 @@ for (f,k,o) in [(:year,ICU.UCAL_YEAR,0),
 
     @eval begin
         function ($f)(t::CalendarTime)
-            cal = _get_cal(t.tz)
-            ICU.setMillis(cal, t.millis)
-            ICU.get(cal, $k) + $o
+            ICU.setMillis(t.cal, t.millis)
+            ICU.get(t.cal, $k) + $o
         end
 
         function ($f)(t::CalendarTime, val::Integer)
-            cal = _get_cal(t.tz)
-            ICU.setMillis(cal, t.millis)
-            ICU.set(cal, $k, val - $o)
-            CalendarTime(ICU.getMillis(cal), t.tz)
+            ICU.setMillis(t.cal, t.millis)
+            ICU.set(t.cal, $k, val - $o)
+            CalendarTime(ICU.getMillis(t.cal), t.cal)
         end
 
         function $(symbol(string(f,'!')))(t::CalendarTime, val::Integer)
-            cal = _get_cal(t.tz)
-            ICU.setMillis(cal, t.millis)
-            ICU.set(cal, $k, val - $o)
-            t.millis = ICU.getMillis(cal)
+            ICU.setMillis(t.cal, t.millis)
+            ICU.set(t.cal, $k, val - $o)
+            t.millis = ICU.getMillis(t.cal)
             t
         end
         @vectorize_1arg CalendarTime $f
@@ -172,9 +173,8 @@ isleap(y::Integer) = (((y % 4 == 0) && (y % 100 != 0)) || (y % 400 == 0))
 @vectorize_1arg CalendarTime isleap
 
 function pm(t::CalendarTime)
-    cal = _get_cal(t.tz)
-    ICU.setMillis(cal, t.millis)
-    ICU.get(cal, ICU.UCAL_AM_PM) == 1
+    ICU.setMillis(t.cal, t.millis)
+    ICU.get(t.cal, ICU.UCAL_AM_PM) == 1
 end
 am(t::CalendarTime) = !pm(t)
 @vectorize_1arg CalendarTime am
@@ -185,14 +185,15 @@ for op in [:<, :(==), :isless]
 end
 
 function format(pattern::String, t::CalendarTime)
-    ICU.format(_get_format(pattern,t.tz), t.millis)
+    ICU.format(_get_format(pattern,t.cal), t.millis)
 end
 format(t::CalendarTime, pattern::String) = format(pattern, t)
 
 function parse_date(pattern::String, s::String, tz::String)
     try
-        millis = ICU.parse(_get_format(pattern,tz), s)
-        return CalendarTime(millis, tz)
+        cal = _get_cal(tz)
+        millis = ICU.parse(_get_format(pattern,cal), s)
+        return CalendarTime(millis, cal)
     catch
         error("failed to parse '", s, "' with '", pattern, "'")
     end
@@ -203,7 +204,7 @@ parse_date{S<:String}(pattern::String, s::AbstractArray{S}) = map(x -> parse_dat
 const parse = parse_date
 
 function show(io::IO, t::CalendarTime)
-    s = ICU.format(_get_format(t.tz), t.millis)
+    s = ICU.format(_get_format(t.cal), t.millis)
     print(io, s)
 end
 
@@ -313,21 +314,20 @@ for op in [:+, :-]
             FixedCalendarDuration($op(d1.millis, d2.millis))
 
         function ($op)(t::CalendarTime, d::CalendarDuration)
-            cal = _get_cal(t.tz)
-            ICU.setMillis(cal, $op(t.millis, d.millis))
+            ICU.setMillis(t.cal, $op(t.millis, d.millis))
             for (f,v) in [(:years,ICU.UCAL_YEAR),
                           (:months,ICU.UCAL_MONTH),
                           (:weeks,ICU.UCAL_WEEK_OF_YEAR)]
                 n = d.(f)
                 if n != 0
-                    ICU.add(cal, v, $op(n))
+                    ICU.add(t.cal, v, $op(n))
                 end
             end
-            CalendarTime(ICU.getMillis(cal), t.tz)
+            CalendarTime(ICU.getMillis(t.cal), t.cal)
         end
 
         ($op)(t::CalendarTime, d::FixedCalendarDuration) =
-            CalendarTime(($op)(t.millis, d.millis), t.tz)
+            CalendarTime(($op)(t.millis, d.millis), t.cal)
 
         ($op)(d::AbstractCalendarDuration, t::CalendarTime) = ($op)(t, d)
 
