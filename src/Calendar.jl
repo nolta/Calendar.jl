@@ -33,8 +33,6 @@ export CalendarTime,
 
        # deprecated
        am, pm,
-
-       # mutate fields
        year!,
        month!,
        week!,
@@ -138,7 +136,7 @@ ymd(y, m, d) = ymd(y, m, d, _tz)
 
 tz(t::CalendarTime) = _tz_cache[t.cal]
 tz(t::CalendarTime, tz) = CalendarTime(t.millis, _get_cal(tz))
-tz!(t::CalendarTime, tz) = (t.cal = _get_cal(tz); t)
+tz!(t::CalendarTime, tz) = (Base.warn_once("tz!(a,b) is deprecated, please use timezone(a,b) instead."; depth=1); t.cal = _get_cal(tz); t)
 const timezone = tz
 
 for (f,k,o) in [(:year,ICU.UCAL_YEAR,0),
@@ -165,6 +163,7 @@ for (f,k,o) in [(:year,ICU.UCAL_YEAR,0),
         end
 
         function $(symbol(string(f,'!')))(t::CalendarTime, val::Integer)
+            Base.warn_once(string($f,"!(a,b) is deprecated, please use ", $f, "(a,b) instead."); depth=1)
             ICU.setMillis(t.cal, t.millis)
             ICU.set(t.cal, $k, val - $o)
             t.millis = ICU.getMillis(t.cal)
