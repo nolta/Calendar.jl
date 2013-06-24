@@ -365,13 +365,7 @@ end
 @vectorize_2arg CalendarTime (-)
 
 
-function (-)(d::CalendarDuration)
-    d2 = CalendarDuration()
-    for f in [:years,:months,:weeks,:millis]
-        d2.(f) = -d.(f)
-    end
-    d2
-end
+(-)(d::CalendarDuration) = CalendarDuration(-d.years, -d.months, -d.weeks, -d.millis)
 (-)(d::FixedCalendarDuration) = FixedCalendarDuration(-d.millis)
 @vectorize_1arg AbstractCalendarDuration (-)
 
@@ -396,6 +390,13 @@ function colon(t1::CalendarTime, d::FixedCalendarDuration, t2::CalendarTime)
     n = ifloor((t2.millis - t1.millis)/d.millis) + 1
     CalendarTimeRange(t1, d, n)
 end
+
+function colon(t1::CalendarTime, d::CalendarDuration, t2::CalendarTime)
+    approx_d = (365.2425*d.years + 30.436875*d.months + 7.*d.weeks)*86400e3 + d.millis
+    n = ifloor((t2.millis - t1.millis)/approx_d) + 1
+    CalendarTimeRange(t1, d, n)
+end
+
 colon(t1::CalendarTime, t2::CalendarTime) = colon(t1, seconds(1), t2)
 
 function ref(r::CalendarTimeRange, i::Integer)
