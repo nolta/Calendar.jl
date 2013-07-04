@@ -9,19 +9,20 @@ Installation
 
 To install the package:
 
-    julia> Pkg.update()
     julia> Pkg.add("Calendar")
 
 Then, to load into your session:
 
     julia> using Calendar
 
-Calendar.jl requires the [International Components for Unicode (ICU) library](http://site.icu-project.org/)
+Calendar.jl requires the [International Components for Unicode (ICU) libraries](http://site.icu-project.org/)
 be installed on your system. It comes preinstalled on OS X and most Linux desktop distributions, but if not:
 
 * Arch: `pacman -S icu`
 * Fedora: `yum install icu`
 * Ubuntu: `aptitude install libicu48`
+
+On Windows, binaries are available [here](http://site.icu-project.org/download).
 
 Creating times
 --------------
