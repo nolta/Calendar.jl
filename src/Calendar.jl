@@ -311,12 +311,16 @@ for op in [:+, :-]
                              $op(d1.millis, d2.millis))
 
         ($op)(d::CalendarDuration, f::FixedCalendarDuration) =
+            CalendarDuration(d.years,
+                             d.months,
+                             d.weeks,
+                             $op(d.millis, f.millis))
+
+        ($op)(f::FixedCalendarDuration, d::CalendarDuration) =
             CalendarDuration($op(d.years),
                              $op(d.months),
                              $op(d.weeks),
-                             $op(d.millis, f.millis))
-
-        ($op)(f::FixedCalendarDuration, d::CalendarDuration) = $op(d, f)
+                             $op(f.millis, d.millis))
 
         ($op)(d1::FixedCalendarDuration, d2::FixedCalendarDuration) =
             FixedCalendarDuration($op(d1.millis, d2.millis))

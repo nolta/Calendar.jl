@@ -17,3 +17,5 @@ t2 = t + seconds(1)
 @assert minute(t2) == 0
 @assert second(t2) == 0
 
+@assert years(4) - hours(1) == CalendarDuration(4,0,0,-3600e3)
+@assert hours(1) - years(4) == CalendarDuration(-4,0,0,3600e3)
