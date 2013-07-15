@@ -55,7 +55,9 @@ julia> t == t2
 true
 ```
 
-See [here](http://userguide.icu-project.org/formatparse/datetime) for a list of format codes.
+The format patterns are from
+[Unicode Technical Standard #35](http://www.unicode.org/reports/tr35/tr35-dates.html#Date_Format_Patterns).
+See [here](http://userguide.icu-project.org/formatparse/datetime) for details on ICU's implementation.
 
 Extracting & setting fields
 ---------------------------
@@ -69,9 +71,6 @@ julia> month(t)
 
 julia> week(t)
 18
-
-julia> isAM(t)
-false
 ```
 
 Available fields:
@@ -93,7 +92,7 @@ Available fields:
     dayofyear(d)  </td><td>
 </td></tr>
 <tr><td>
-    dayofweek(d)  </td><td> Sunday==1
+    dayofweek(d)  </td><td> Sunday = 1, ..., Saturday = 7
 </td></tr>
 <tr><td>
     hour(d)       </td><td> 24hr clock
@@ -106,12 +105,6 @@ Available fields:
 </td></tr>
 <tr><td>
     second(d)     </td><td>
-</td></tr>
-<tr><td>
-    isAM(d)       </td><td> is time before noon?
-</td></tr>
-<tr><td>
-    isPM(d)       </td><td> is time after noon?
 </td></tr>
 </table>
 
@@ -128,6 +121,26 @@ julia> year(t2, 1984)
 Dec 3, 1984 3:07:08 PM EST
 ```
  
+Tests
+-----
+
+```jlcon
+julia> t
+May 2, 2013 1:45:07 PM PDT
+
+julia> isAM(t)
+false
+```
+
+<table>
+<tr><td>
+    isAM(d)       </td><td> is time before noon?
+</td></tr>
+<tr><td>
+    isPM(d)       </td><td> is time after noon?
+</td></tr>
+</table>
+
 Durations
 ---------
 
