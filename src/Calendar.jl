@@ -13,9 +13,9 @@ export CalendarTime,
        ymd_hms,
 
        # tests
-       isleap,
        isAM,
        isPM,
+       isleapyear,
 
        # fields
        year,
@@ -33,6 +33,7 @@ export CalendarTime,
 
        # deprecated
        am, pm,
+       isleap,
        year!,
        month!,
        week!,
@@ -173,9 +174,10 @@ for (f,k,o) in [(:year,ICU.UCAL_YEAR,0),
     end
 end
 
-isleap(t::CalendarTime) = isleap(year(t))
-isleap(y::Integer) = (((y % 4 == 0) && (y % 100 != 0)) || (y % 400 == 0))
-@vectorize_1arg CalendarTime isleap
+isleapyear(t::CalendarTime) = isleapyear(year(t))
+isleapyear(y::Integer) = (((y % 4 == 0) && (y % 100 != 0)) || (y % 400 == 0))
+@vectorize_1arg CalendarTime isleapyear
+@deprecate isleap isleapyear
 
 function isPM(t::CalendarTime)
     ICU.setMillis(t.cal, t.millis)

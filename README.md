@@ -139,6 +139,9 @@ false
 <tr><td>
     isPM(d)       </td><td> is time after noon?
 </td></tr>
+<tr><td>
+    isleapyear(d) </td><td> is leap year?
+</td></tr>
 </table>
 
 Durations
