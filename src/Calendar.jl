@@ -121,7 +121,6 @@ end
 
 function ymd_hms(y::Integer, mo::Integer, d::Integer, h::Integer, mi::Integer, s::Real, tz=_tz)
     cal = _get_cal(tz)
-    ICU.clear(cal)
     is = itrunc(s)
     ms = rem(s,1)*1e3
     ICU.setDateTime(cal, y, mo, d, h, mi, is)
