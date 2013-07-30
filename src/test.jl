@@ -1,14 +1,14 @@
-require("Calendar")
+include("Calendar.jl")
 using Calendar
 
-@assert isleap(2012)
-@assert !isleap(2011)
-@assert !isleap(2013)
-@assert isleap(2020)
-@assert !isleap(1900)
-@assert !isleap(1901)
-@assert isleap(1904)
-@assert isleap(2000)
+@assert isleapyear(2012)
+@assert !isleapyear(2011)
+@assert !isleapyear(2013)
+@assert isleapyear(2020)
+@assert !isleapyear(1900)
+@assert !isleapyear(1901)
+@assert isleapyear(1904)
+@assert isleapyear(2000)
 
 # daylight savings time
 t = ymd_hms(2013, 3, 10, 1, 59, 59)
