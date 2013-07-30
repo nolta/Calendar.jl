@@ -19,3 +19,9 @@ t2 = t + seconds(1)
 
 @assert years(4) - hours(1) == CalendarDuration(4,0,0,-3600e3)
 @assert hours(1) - years(4) == CalendarDuration(-4,0,0,3600e3)
+
+t1 = ymd_hms(2013, 7, 30, 14, 22, 11)
+t2 = ymd_hms(2013, 7, 30, 14, 22, 11.5)
+d = t2 - t1
+@assert d == seconds(0.5)
+@assert d === FixedCalendarDuration(500.)

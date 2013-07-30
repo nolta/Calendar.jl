@@ -119,21 +119,16 @@ function today()
     ymd(year(n), month(n), day(n))
 end
 
-function ymd_hms(y, mo, d, h, mi, s, tz)
+function ymd_hms(y::Integer, mo::Integer, d::Integer, h::Integer, mi::Integer, s::Real, tz=_tz)
     cal = _get_cal(tz)
     ICU.clear(cal)
-    ICU.setDateTime(cal, y, mo, d, h, mi, s)
-    CalendarTime(ICU.getMillis(cal), cal)
+    is = itrunc(s)
+    ms = rem(s,1)*1e3
+    ICU.setDateTime(cal, y, mo, d, h, mi, is)
+    CalendarTime(ICU.getMillis(cal) + ms, cal)
 end
-ymd_hms(y, mo, d, h, mi, s) = ymd_hms(y, mo, d, h, mi, s, _tz)
 
-function ymd(y, m, d, tz)
-    cal = _get_cal(tz)
-    ICU.clear(cal)
-    ICU.setDate(cal, y, m, d)
-    CalendarTime(ICU.getMillis(cal), cal)
-end
-ymd(y, m, d) = ymd(y, m, d, _tz)
+ymd(y::Integer, m::Integer, d::Integer, tz=_tz) = ymd_hms(y, m, d, 0, 0, 0, tz)
 
 tz(t::CalendarTime) = _tz_cache[t.cal]
 tz(t::CalendarTime, tz) = CalendarTime(t.millis, _get_cal(tz))
@@ -369,7 +364,6 @@ end
 
 (-)(t1::CalendarTime, t2::CalendarTime) = FixedCalendarDuration(t1.millis - t2.millis)
 @vectorize_2arg CalendarTime (-)
-
 
 (-)(d::CalendarDuration) = CalendarDuration(-d.years, -d.months, -d.weeks, -d.millis)
 (-)(d::FixedCalendarDuration) = FixedCalendarDuration(-d.millis)
