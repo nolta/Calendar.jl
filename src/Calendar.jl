@@ -243,12 +243,11 @@ hm(h::Real, m::Real) = hms(h, m, 0)
 
 function print_millis(io::IO, millis::Float64, first::Bool)
     negative = millis < 0
-    millis = abs(millis)
-    for (x,tag) in [(86400e3," day"),(3600e3," hour"),
-                    (60e3," minute"),(1e3," second")]
-        if millis >= x
-            n = ifloor(millis/x)
-            millis -= n*x
+    secs = abs(millis*1e-3)
+    for (x,tag) in [(86400," day"),(3600," hour"), (60," minute")]
+        if secs >= x
+            n = ifloor(secs/x)
+            secs -= n*x
 
             if first
                 if negative write(io,'-') end
@@ -260,15 +259,15 @@ function print_millis(io::IO, millis::Float64, first::Bool)
             if n > 1 write(io,'s') end
         end
     end
-    if millis > 0
+    if secs > 0
         if first
             if negative write(io,'-') end
             first = false
         else
             write(io, negative ? " - " : " + ")
         end
-        n = ifloor(millis)
-        print(io, n, " ms")
+        print(io, isinteger(secs) ? int(secs) : secs, " second")
+        if secs != 1. write(io,'s') end
     end
 end
 

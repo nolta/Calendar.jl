@@ -25,3 +25,10 @@ t2 = ymd_hms(2013, 7, 30, 14, 22, 11.5)
 d = t2 - t1
 @assert d == seconds(0.5)
 @assert d === FixedCalendarDuration(500.)
+@assert repr(d) == "0.5 seconds"
+
+@assert repr(years(1) + months(1)) == "1 year + 1 month"
+@assert repr(years(2) + months(1)) == "2 years + 1 month"
+@assert repr(years(1) + months(2)) == "1 year + 2 months"
+@assert repr(years(2) + months(2)) == "2 years + 2 months"
+@assert repr(days(3) + seconds(4)) == "3 days + 4 seconds"
