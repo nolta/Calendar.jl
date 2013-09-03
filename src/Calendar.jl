@@ -34,16 +34,6 @@ export CalendarTime,
        # deprecated
        am, pm,
        isleap,
-       year!,
-       month!,
-       week!,
-       dayofyear!,
-       day!,
-       hour!,
-       hour12!,
-       minute!,
-       second!,
-       tz!,
 
        # durations
        CalendarDuration,
@@ -69,7 +59,7 @@ import Base.show, Base.(+), Base.(-), Base.(<), Base.(==), Base.length,
        Base.colon, Base.ref, Base.start, Base.next, Base.done, Base.(*), Base.(.*),
        Base.size, Base.step, Base.vcat, Base.isless, Base.hash, Base.isequal
 
-type CalendarTime
+immutable CalendarTime
     millis::Float64
     cal::ICU.ICUCalendar
 end
@@ -131,7 +121,6 @@ ymd(y::Integer, m::Integer, d::Integer, tz=_tz) = ymd_hms(y, m, d, 0, 0, 0, tz)
 
 tz(t::CalendarTime) = _tz_cache[t.cal]
 tz(t::CalendarTime, tz) = CalendarTime(t.millis, _get_cal(tz))
-tz!(t::CalendarTime, tz) = (Base.warn_once("tz!(a,b) is deprecated, please use timezone(a,b) instead."; depth=1); t.cal = _get_cal(tz); t)
 const timezone = tz
 
 for (f,k,o) in [(:year,ICU.UCAL_YEAR,0),
@@ -157,13 +146,6 @@ for (f,k,o) in [(:year,ICU.UCAL_YEAR,0),
             CalendarTime(ICU.getMillis(t.cal), t.cal)
         end
 
-        function $(symbol(string(f,'!')))(t::CalendarTime, val::Integer)
-            Base.warn_once(string($f,"!(a,b) is deprecated, please use ", $f, "(a,b) instead."); depth=1)
-            ICU.setMillis(t.cal, t.millis)
-            ICU.set(t.cal, $k, val - $o)
-            t.millis = ICU.getMillis(t.cal)
-            t
-        end
         @vectorize_1arg CalendarTime $f
     end
 end
