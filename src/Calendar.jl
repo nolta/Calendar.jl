@@ -117,6 +117,19 @@ function ymd_hms(y::Integer, mo::Integer, d::Integer, h::Integer, mi::Integer, s
     CalendarTime(ICU.getMillis(cal) + ms, cal)
 end
 
+function ymd_hms(s::String, tz=_tz)
+    re = r"(\d{4})[^\d]+(\d{1,2})[^\d]+(\d{1,2})[^\d]+(\d{1,2})[^\d]+(\d{2})[^\d]+(\d{2})"
+    m = match(re, s)
+    if m === nothing; return nothing end
+    y  = int(m.captures[1])
+    mo = int(m.captures[2])
+    d  = int(m.captures[3])
+    h  = int(m.captures[4])
+    mi = int(m.captures[5])
+    s  = int(m.captures[6])
+    ymd_hms(y, mo, d, h, mi, s, tz)
+end
+
 ymd(y::Integer, m::Integer, d::Integer, tz=_tz) = ymd_hms(y, m, d, 0, 0, 0, tz)
 
 tz(t::CalendarTime) = _tz_cache[t.cal]
