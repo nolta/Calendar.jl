@@ -1,5 +1,6 @@
 include("Calendar.jl")
 using Calendar
+using Base.Test
 
 @assert isleapyear(2012)
 @assert !isleapyear(2011)
@@ -32,3 +33,9 @@ d = t2 - t1
 @assert repr(years(1) + months(2)) == "1 year + 2 months"
 @assert repr(years(2) + months(2)) == "2 years + 2 months"
 @assert repr(days(3) + seconds(4)) == "3 days + 4 seconds"
+
+f = "yyyy.MM.dd G 'at' HH:mm:ss zzz"
+d = ymd_hms(2014,7,4,16,33,29)
+s = "2014.07.04 AD at 16:33:29 EDT"
+@test Calendar.parse(f, s) == d
+@test format(f, d) == s

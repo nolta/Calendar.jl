@@ -113,6 +113,7 @@ function ymd_hms(y::Integer, mo::Integer, d::Integer, h::Integer, mi::Integer, s
     cal = _get_cal(tz)
     is = itrunc(s)
     ms = rem(s,1)*1e3
+    ICU.clear(cal)
     ICU.setDateTime(cal, y, mo, d, h, mi, is)
     CalendarTime(ICU.getMillis(cal) + ms, cal)
 end
