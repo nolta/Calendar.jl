@@ -11,6 +11,7 @@ export CalendarTime,
        parse_date,
        ymd,
        ymd_hms,
+       yDhms,
 
        # tests
        isAM,
@@ -129,6 +130,19 @@ function ymd_hms(s::String, tz=_tz)
     mi = int(m.captures[5])
     s  = int(m.captures[6])
     ymd_hms(y, mo, d, h, mi, s, tz)
+end
+
+function yDhms(y::Integer, jd::Integer, h::Integer, mi::Integer, s::Real, tz=_tz)
+    cal = _get_cal(tz)
+    is = itrunc(s)
+    ms = rem(s,1)*1e3
+    ICU.clear(cal)
+    ICU.set(cal, ICU.UCAL_YEAR, y)
+    ICU.set(cal, ICU.UCAL_DAY_OF_YEAR, jd)
+    ICU.set(cal, ICU.UCAL_HOUR, h)
+    ICU.set(cal, ICU.UCAL_MINUTE, mi)
+    ICU.set(cal, ICU.UCAL_SECOND, is)
+    CalendarTime(ICU.getMillis(cal) + ms, cal)
 end
 
 ymd(y::Integer, m::Integer, d::Integer, tz=_tz) = ymd_hms(y, m, d, 0, 0, 0, tz)
