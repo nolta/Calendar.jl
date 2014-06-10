@@ -39,3 +39,7 @@ d = ymd_hms(2014,7,4,16,33,29)
 s = "2014.07.04 AD at 16:33:29 EDT"
 @test Calendar.parse(f, s) == d
 @test format(f, d) == s
+
+d1 = yDhms(2014,66,1,2,3)
+d2 = ymd_hms(2014,3,7,1,2,3)
+@test format(f, d1) == format(f, d2)
