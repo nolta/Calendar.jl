@@ -57,7 +57,7 @@ export CalendarTime,
        January, February, March, April, May, June, July, August, September, October, November, December
 
 import Base.show, Base.(+), Base.(-), Base.(<), Base.(==), Base.length,
-       Base.colon, Base.ref, Base.start, Base.next, Base.done, Base.(*), Base.(.*),
+       Base.colon, Base.getindex, Base.start, Base.next, Base.done, Base.(*), Base.(.*),
        Base.size, Base.step, Base.vcat, Base.isless, Base.hash, Base.isequal
 
 immutable CalendarTime
@@ -407,7 +407,7 @@ end
 
 colon(t1::CalendarTime, t2::CalendarTime) = colon(t1, seconds(1), t2)
 
-function ref(r::CalendarTimeRange, i::Integer)
+function getindex(r::CalendarTimeRange, i::Integer)
     if !(1 <= i <= r.len); error(BoundsError); end
     r.start + (i-1)*r.step
 end
