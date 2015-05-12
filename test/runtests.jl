@@ -1,4 +1,4 @@
-include("Calendar.jl")
+include("../src/Calendar.jl")
 using Calendar
 using Base.Test
 
