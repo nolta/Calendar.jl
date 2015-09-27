@@ -1,8 +1,7 @@
-require("ICU")
-
 module Calendar
 
 import ICU
+using Compat
 
 export CalendarTime,
        format,
@@ -112,14 +111,14 @@ end
 
 function ymd_hms(y::Integer, mo::Integer, d::Integer, h::Integer, mi::Integer, s::Real, tz=_tz)
     cal = _get_cal(tz)
-    is = itrunc(s)
+    is = trunc(Integer,s)
     ms = rem(s,1)*1e3
     ICU.clear(cal)
     ICU.setDateTime(cal, y, mo, d, h, mi, is)
     CalendarTime(ICU.getMillis(cal) + ms, cal)
 end
 
-function ymd_hms(s::String, tz=_tz)
+function ymd_hms(s::AbstractString, tz=_tz)
     re = r"(\d{4})[^\d]+(\d{1,2})[^\d]+(\d{1,2})[^\d]+(\d{1,2})[^\d]+(\d{2})[^\d]+(\d{2})"
     m = match(re, s)
     if m === nothing; return nothing end
@@ -134,7 +133,7 @@ end
 
 function yDhms(y::Integer, jd::Integer, h::Integer, mi::Integer, s::Real, tz=_tz)
     cal = _get_cal(tz)
-    is = itrunc(s)
+    is = trunc(Integer,s)
     ms = rem(s,1)*1e3
     ICU.clear(cal)
     ICU.set(cal, ICU.UCAL_YEAR, y)
@@ -198,12 +197,12 @@ for op in [:<, :(==), :isless]
     @eval ($op)(t1::CalendarTime, t2::CalendarTime) = ($op)(t1.millis, t2.millis)
 end
 
-function format(pattern::String, t::CalendarTime)
+function format(pattern::AbstractString, t::CalendarTime)
     utf8(ICU.format(_get_format(pattern,t.cal), t.millis))
 end
-format(t::CalendarTime, pattern::String) = format(pattern, t)
+format(t::CalendarTime, pattern::AbstractString) = format(pattern, t)
 
-function parse_date(pattern::String, s::String, tz::String)
+function parse_date(pattern::AbstractString, s::AbstractString, tz::AbstractString)
     try
         cal = _get_cal(tz)
         millis = ICU.parse(_get_format(pattern,cal), s)
@@ -213,8 +212,8 @@ function parse_date(pattern::String, s::String, tz::String)
     end
 end
 parse_date(pattern, s) = parse_date(pattern, s, _tz)
-parse_date{S<:String}(pattern::String, s::AbstractArray{S}, tz::String) = map(x -> parse_date(pattern, x, tz), s)
-parse_date{S<:String}(pattern::String, s::AbstractArray{S}) = map(x -> parse_date(pattern, x, _tz), s)
+parse_date{S<:AbstractString}(pattern::AbstractString, s::AbstractArray{S}, tz::AbstractString) = map(x -> parse_date(pattern, x, tz), s)
+parse_date{S<:AbstractString}(pattern::AbstractString, s::AbstractArray{S}) = map(x -> parse_date(pattern, x, _tz), s)
 const parse = parse_date
 
 function show(io::IO, t::CalendarTime)
@@ -255,7 +254,7 @@ function print_millis(io::IO, millis::Float64, first::Bool)
     secs = abs(millis*1e-3)
     for (x,tag) in [(86400," day"),(3600," hour"), (60," minute")]
         if secs >= x
-            n = ifloor(secs/x)
+            n = floor(Integer,secs/x)
             secs -= n*x
 
             if first
@@ -275,7 +274,7 @@ function print_millis(io::IO, millis::Float64, first::Bool)
         else
             write(io, negative ? " - " : " + ")
         end
-        print(io, isinteger(secs) ? int(secs) : secs, " second")
+        print(io, isinteger(secs) ? round(Int,secs) : secs, " second")
         if secs != 1. write(io,'s') end
     end
 end
@@ -348,7 +347,7 @@ for op in [:+, :-]
 
         ($op)(d::AbstractCalendarDuration, t::CalendarTime) = ($op)(t, d)
 
-        @vectorize_2arg Union(CalendarTime, AbstractCalendarDuration) $op
+        @vectorize_2arg @compat(Union{CalendarTime, AbstractCalendarDuration}) $op
         # Fix up cases that @vectorize doesn't cover (without this, the result is of type Array{Any}):
         # I can't figure out how to consolidate this.
         ($op)(x::Array{CalendarTime}, y::Array{CalendarDuration}     ) = reshape(CalendarTime[ ($op)(x[i], y[i]) for i=1:length(x) ], promote_shape(size(x),size(y)))
@@ -384,7 +383,7 @@ for op in [:<, :(==)]
     end
 end
 
-immutable CalendarTimeRange{T<:AbstractCalendarDuration} <: Ranges{CalendarTime}
+immutable CalendarTimeRange{T<:AbstractCalendarDuration} <: Range{CalendarTime}
     start::CalendarTime
     step::T
     len::Int
@@ -395,13 +394,13 @@ function show{T}(io::IO, r::CalendarTimeRange{T})
 end
 
 function colon(t1::CalendarTime, d::FixedCalendarDuration, t2::CalendarTime)
-    n = ifloor((t2.millis - t1.millis)/d.millis) + 1
+    n = floor(Integer, (t2.millis - t1.millis)/d.millis) + 1
     CalendarTimeRange(t1, d, n)
 end
 
 function colon(t1::CalendarTime, d::CalendarDuration, t2::CalendarTime)
     approx_d = (365.2425*d.years + 30.436875*d.months + 7.*d.weeks)*86400e3 + d.millis
-    n = ifloor((t2.millis - t1.millis)/approx_d) + 1
+    n = floor(Integer, (t2.millis - t1.millis)/approx_d) + 1
     CalendarTimeRange(t1, d, n)
 end
 
